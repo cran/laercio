@@ -1,0 +1,4 @@
+export(LTukey,LDuncan,LScottKnott,ldata)
+S3method(LTukey,aov)
+S3method(LDuncan,aov)
+S3method(LScottKnott,aov)
