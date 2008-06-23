@@ -9,8 +9,10 @@
 
 \examples{
 require(laercio)
-anv <- aov(mean~factor,ldata)
-LTukey(anv)
+ldata$trat <- as.factor(ldata$trat)
+anv <- aov(resp~trat,ldata)
+anova(anv)
+LTukey(anv,"trat")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

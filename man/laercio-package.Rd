@@ -3,17 +3,17 @@
 \alias{laercio}
 \docType{package}
 \title{
-Functions for Means comparison.
+Duncan test, Tukey test and Scott-Knott test.
 }
 \description{
-The package contains tests to compare means.
+The package contains functions to compare and group means.
 }
 \details{
 \tabular{ll}{
 Package: \tab laercio\cr
 Type: \tab Package\cr
-Version: \tab 0.9-1\cr
-Date: \tab 2008-06-10\cr
+Version: \tab 0.9-2\cr
+Date: \tab 2008-06-11\cr
 License: \tab GPL (>= 2)\cr
 }
 }
