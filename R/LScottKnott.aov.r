@@ -1,22 +1,22 @@
-`LScottKnott.aov` <- function(anova,which="")
+`LScottKnott.aov` <- function(anova,which="",conf.level=0.95)
 {
- sk <- function(medias,s2,dfr)
+ sk <- function(medias,s2,dfr,prob)
  {
 	bo <- 0
 	si2 <- s2
 	defr <- dfr
-	parou <- 0
-	np <- length(medias) - 1 #numero de particoes
+	parou <- 1
+	np <- length(medias) - 1
 
-	for (i in 1:np)
+	for (i in 1:np) #ve qual e o maior B0
 	{
 	g1 <- medias[1:i]
 	g2 <- medias[(i+1):length(medias)]
 	B0 <- sum(g1)^2/length(g1) + sum(g2)^2/length(g2) - (sum(g1) + sum(g2))^2/length(c(g1,g2))
-	 if (bo < B0)
+	if (B0 > bo)
 		{
-		 bo <- B0;
-		 parou <- i;
+		 bo <- B0
+		 parou <- i
 		}
 	}
 	
@@ -32,20 +32,23 @@
 	
 	p <- pchisq(lamb,v0,lower.tail = F)
 
-	cat(names(g1), " / ", names(g2)," prob.: ", p,"\n")
+		if (p < prob) {
+			for (i in 1:length(g1)){
+			cat(names(g1[i]),"\n",file="skresult",append=T)
+			}
+		}
 
 	if (length(g1)>1)
 	{
-	sk(g1,s2,dfr)
+	sk(g1,s2,dfr,prob)
 	}
 	if (length(g2)>1)
 	{
-	sk(g2,s2,dfr)
+	sk(g2,s2,dfr,prob)
 	}
 }
 
  variaveis <- names(anova$model)
- 
  for (i in 2:length(variaveis))
  {
  if (variaveis[i] == which)
@@ -54,18 +57,66 @@
  stop }
  else { next }
  }
- 
- medias <- sort(tapply(anova$model[[1]],anova$model[[vari]],mean),decreasing=T)
- dfr <- anova$df.residual
+
+medias <- sort(tapply(anova$model[[1]],anova$model[[vari]],mean),decreasing=T)
+dfr <- anova$df.residual
 
 	a <- tapply(anova$model[[1]]^2,anova$model[[vari]],sum)
 	b <- tapply(anova$model[[1]],anova$model[[vari]],sum)
 	c <- tapply(anova$model[[1]],anova$model[[vari]],length)
 	s2 <- sum(((a-(b^2/c))/anova$df.residual)/c)
 
+cat("\n","SCOTT-KNOTT ORIGINAL TEST","\n","\n",
+"Confidence Level: ",conf.level,"\n",
+"Independent variable: ", which,"\n","\n")
 
-cat("\n","SCOTT-KNOTT test","\n","\n")
-cat(which,"\n","\n")
-sk(medias,s2,dfr)
-cat("\n","\n")
+prob <- 1-conf.level
+
+sk(medias,s2,dfr,prob)
+
+f <- names(medias)
+names(medias) <- 1:length(medias)
+resultado <- data.frame("f"=f,"m"=medias,"r"=0)
+
+if (file.exists("skresult") == FALSE) {stop}
+else
+{
+	xx <- read.table("skresult")
+	file.remove("skresult")
+	x <- xx[[1]]
+	x <- as.vector(x)
+	z <- 1
+	for (j in 1:length(x)) {
+		for (i in 1:length(resultado$f)){
+			if (resultado$f[i]==x[j]){
+				resultado$r[i] <- z
+			}
+			if (i == length(resultado$f)){
+			z <- z+1
+			}
+		}
+	}
+}
+
+res <- 1
+for (i in 1:(length(resultado$r)-1))
+	{
+		if (resultado$r[i] != resultado$r[i+1]){
+			resultado$r[i] <- LETTERS[res]
+			res <- res+1
+				if (i == (length(resultado$r)-1)){
+				resultado$r[i+1] <- LETTERS[res]			
+				}	
+		}
+		else{
+			resultado$r[i] <- LETTERS[res]
+				if (i == (length(resultado$r)-1)){
+				resultado$r[i+1] <- LETTERS[res]			
+				}	
+
+		}
+
+	}
+names(resultado) <- c("FACTORS","MEANS"," ")
+print(resultado)
 }
