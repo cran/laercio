@@ -1,12 +1,13 @@
 `LScottKnott.aov` <- function(anova,which="",conf.level=0.95)
 {
  sk <- function(medias,s2,dfr,prob)
+ # esta funcao faz os calculos de bo e da probabilidade
  {
 	bo <- 0
 	si2 <- s2
 	defr <- dfr
 	parou <- 1
-	np <- length(medias) - 1
+	np <- length(medias) - 1 #numero de particoes
 
 	for (i in 1:np) #ve qual e o maior B0
 	{
@@ -31,14 +32,14 @@
 	v0 <- length(teste)/(pi-2)
 	
 	p <- pchisq(lamb,v0,lower.tail = F)
-
+	
 		if (p < prob) {
 			for (i in 1:length(g1)){
 			cat(names(g1[i]),"\n",file="skresult",append=T)
 			}
 		}
 
-	if (length(g1)>1)
+	if (length(g1)>1) #para calcular os demais grupos
 	{
 	sk(g1,s2,dfr,prob)
 	}
@@ -49,7 +50,7 @@
 }
 
  variaveis <- names(anova$model)
- for (i in 2:length(variaveis))
+ for (i in 2:length(variaveis))	#para saber qual a variavel para o calculo
  {
  if (variaveis[i] == which)
  { 
@@ -61,10 +62,11 @@
 medias <- sort(tapply(anova$model[[1]],anova$model[[vari]],mean),decreasing=T)
 dfr <- anova$df.residual
 
-	a <- tapply(anova$model[[1]]^2,anova$model[[vari]],sum)
-	b <- tapply(anova$model[[1]],anova$model[[vari]],sum)
-	c <- tapply(anova$model[[1]],anova$model[[vari]],length)
-	s2 <- sum(((a-(b^2/c))/anova$df.residual)/c)
+	rep <- tapply(anova$model[[1]],anova$model[[vari]],length)
+	erro <- anova$fitted.values-anova$model[[1]]
+	s0 <- (erro^2)/anova$df.residual
+	s1 <- tapply(s0,anova$model[[vari]],sum)
+	s2 <- sum(s1/rep)
 
 cat("\n","SCOTT-KNOTT ORIGINAL TEST","\n","\n",
 "Confidence Level: ",conf.level,"\n",
@@ -75,10 +77,10 @@ prob <- 1-conf.level
 sk(medias,s2,dfr,prob)
 
 f <- names(medias)
-names(medias) <- 1:length(medias)
+names(medias) <- 1:length(medias)		#monta a tabela de resultado
 resultado <- data.frame("f"=f,"m"=medias,"r"=0)
 
-if (file.exists("skresult") == FALSE) {stop}
+if (file.exists("skresult") == FALSE) {stop}	#muda o valor do r da tabela, se o arquivo tiver vazio a funcao para
 else
 {
 	xx <- read.table("skresult")
@@ -86,20 +88,18 @@ else
 	x <- xx[[1]]
 	x <- as.vector(x)
 	z <- 1
-	for (j in 1:length(x)) {
-		for (i in 1:length(resultado$f)){
+
+	for (i in 1:length(resultado$f)){
+	for (j in 1:length(x)){
 			if (resultado$f[i]==x[j]){
-				resultado$r[i] <- z
-			}
-			if (i == length(resultado$f)){
-			z <- z+1
+				resultado$r[i] <- resultado$r[i] + z
 			}
 		}
 	}
 }
 
 res <- 1
-for (i in 1:(length(resultado$r)-1))
+for (i in 1:(length(resultado$r)-1))		#coloca as letras
 	{
 		if (resultado$r[i] != resultado$r[i+1]){
 			resultado$r[i] <- LETTERS[res]

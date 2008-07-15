@@ -12,8 +12,8 @@ The package contains functions to compare and group means.
 \tabular{ll}{
 Package: \tab laercio\cr
 Type: \tab Package\cr
-Version: \tab 0.9-3\cr
-Date: \tab 2008-06-29\cr
+Version: \tab 0.9-4\cr
+Date: \tab 2008-07-15\cr
 License: \tab GPL (>= 2)\cr
 }
 }
