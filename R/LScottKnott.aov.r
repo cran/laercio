@@ -1,7 +1,6 @@
 `LScottKnott.aov` <- function(anova,which="",conf.level=0.95)
 {
  sk <- function(medias,s2,dfr,prob)
- # esta funcao faz os calculos de bo e da probabilidade
  {
 	bo <- 0
 	si2 <- s2
@@ -37,9 +36,10 @@
 			for (i in 1:length(g1)){
 			cat(names(g1[i]),"\n",file="skresult",append=T)
 			}
+		cat("*","\n",file="skresult",append=T)
 		}
 
-	if (length(g1)>1) #para calcular os demais grupos
+	if (length(g1)>1)
 	{
 	sk(g1,s2,dfr,prob)
 	}
@@ -50,7 +50,7 @@
 }
 
  variaveis <- names(anova$model)
- for (i in 2:length(variaveis))	#para saber qual a variavel para o calculo
+ for (i in 2:length(variaveis))
  {
  if (variaveis[i] == which)
  { 
@@ -77,10 +77,10 @@ prob <- 1-conf.level
 sk(medias,s2,dfr,prob)
 
 f <- names(medias)
-names(medias) <- 1:length(medias)		#monta a tabela de resultado
+names(medias) <- 1:length(medias)
 resultado <- data.frame("f"=f,"m"=medias,"r"=0)
 
-if (file.exists("skresult") == FALSE) {stop}	#muda o valor do r da tabela, se o arquivo tiver vazio a funcao para
+if (file.exists("skresult") == FALSE) {stop}
 else
 {
 	xx <- read.table("skresult")
@@ -89,17 +89,21 @@ else
 	x <- as.vector(x)
 	z <- 1
 
-	for (i in 1:length(resultado$f)){
+
 	for (j in 1:length(x)){
-			if (resultado$f[i]==x[j]){
-				resultado$r[i] <- resultado$r[i] + z
-			}
+		if (x[j] == "*")	{z <- z+1}
+		for (i in 1:length(resultado$f)){
+		if (resultado$f[i]==x[j]){
+		resultado$r[i] <- z;
+		}
+		
 		}
 	}
+
 }
 
 res <- 1
-for (i in 1:(length(resultado$r)-1))		#coloca as letras
+for (i in 1:(length(resultado$r)-1))
 	{
 		if (resultado$r[i] != resultado$r[i+1]){
 			resultado$r[i] <- LETTERS[res]
