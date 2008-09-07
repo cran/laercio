@@ -1,6 +1,7 @@
-`LScottKnott.aov` <- function(anova,which="",conf.level=0.95)
+LScottKnott.aov <- function(anova,which,conf.level=0.95)
 {
  sk <- function(medias,s2,dfr,prob)
+ # esta funcao faz os calculos de bo e da probabilidade
  {
 	bo <- 0
 	si2 <- s2
@@ -39,7 +40,7 @@
 		cat("*","\n",file="skresult",append=T)
 		}
 
-	if (length(g1)>1)
+	if (length(g1)>1) #para calcular os demais grupos
 	{
 	sk(g1,s2,dfr,prob)
 	}
@@ -50,17 +51,20 @@
 }
 
  variaveis <- names(anova$model)
- for (i in 2:length(variaveis))
+ vari <- 0
+ for (i in 2:length(variaveis))	#para saber qual a variavel para o calculo
  {
- if (variaveis[i] == which)
+	 if (variaveis[i] == which)
  { 
  vari <- i
  stop }
  else { next }
  }
 
-medias <- sort(tapply(anova$model[[1]],anova$model[[vari]],mean),decreasing=T)
-dfr <- anova$df.residual
+ if (vari == 0) {cat("'",which,"'"," - Factor not identified.","\n")} else {
+
+ medias <- sort(tapply(anova$model[[1]],anova$model[[vari]],mean),decreasing=T)
+ dfr <- anova$df.residual
 
 	rep <- tapply(anova$model[[1]],anova$model[[vari]],length)
 	erro <- anova$fitted.values-anova$model[[1]]
@@ -68,21 +72,21 @@ dfr <- anova$df.residual
 	s1 <- tapply(s0,anova$model[[vari]],sum)
 	s2 <- sum(s1/rep)
 
-cat("\n","SCOTT-KNOTT ORIGINAL TEST","\n","\n",
-"Confidence Level: ",conf.level,"\n",
-"Independent variable: ", which,"\n","\n")
+ cat("\n","SCOTT-KNOTT ORIGINAL TEST","\n","\n",
+ "Confidence Level: ",conf.level,"\n",
+ "Independent variable: ", which,"\n","\n")
 
-prob <- 1-conf.level
+ prob <- 1-conf.level
 
-sk(medias,s2,dfr,prob)
+ sk(medias,s2,dfr,prob)
 
-f <- names(medias)
-names(medias) <- 1:length(medias)
-resultado <- data.frame("f"=f,"m"=medias,"r"=0)
+ f <- names(medias)
+ names(medias) <- 1:length(medias)		#monta a tabela de resultado
+ resultado <- data.frame("f"=f,"m"=medias,"r"=0)
 
-if (file.exists("skresult") == FALSE) {stop}
-else
-{
+ if (file.exists("skresult") == FALSE) {stop}	#muda o valor do r da tabela, se o arquivo tiver vazio a funcao para
+ else
+ {
 	xx <- read.table("skresult")
 	file.remove("skresult")
 	x <- xx[[1]]
@@ -100,10 +104,10 @@ else
 		}
 	}
 
-}
+ }
 
-res <- 1
-for (i in 1:(length(resultado$r)-1))
+ res <- 1
+ for (i in 1:(length(resultado$r)-1))		#coloca as letras
 	{
 		if (resultado$r[i] != resultado$r[i+1]){
 			resultado$r[i] <- LETTERS[res]
@@ -121,6 +125,7 @@ for (i in 1:(length(resultado$r)-1))
 		}
 
 	}
-names(resultado) <- c("FACTORS","MEANS"," ")
-print(resultado)
+ names(resultado) <- c("FACTORS","MEANS"," ")
+ print(resultado)
+}
 }

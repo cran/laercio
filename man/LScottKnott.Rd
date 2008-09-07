@@ -3,10 +3,10 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Scott-Knott test }
 \description{
- Scott-Knott test to group means.
+  Scott-Knott test to group means. This function was tested and it worked correctly for completely random design and randomized complete block design.
 }
 \usage{
-LScottKnott(anova, which = "",conf.level=0.95)
+LScottKnott(anova, which, conf.level=0.95)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -17,11 +17,22 @@ LScottKnott(anova, which = "",conf.level=0.95)
 \references{ GATES, C.E.; BILBRO, J.D. Illustration of a Cluster Analysis Method for Mean Separation. Agronomy Journal, Vol.70, May-June 1978.}
 \author{ Laercio Junio da Silva \email{laerciojunio@yahoo.com.br} }
 \examples{
+#completely random design
 require(laercio)
-ldata$trat <- as.factor(ldata$trat)
+ldata$trat <- factor(ldata$trat)
 anv <- aov(resp~trat,ldata)
 anova(anv)
 LScottKnott(anv,"trat")
+
+#randomized complete block design
+require(laercio)
+ldata$trat <- factor(ldata$trat)
+ldata$block <- factor(ldata$block)
+anv <- aov(resp~trat+block,ldata)
+anova(anv)
+LScottKnott(anv,"trat")
+LScottKnott(anv,"block")
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
