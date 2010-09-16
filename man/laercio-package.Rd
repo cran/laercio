@@ -23,4 +23,3 @@ Laercio Junio da Silva
 Maintainer: Laercio Junio da Silva \email{laerciojunio@yahoo.com.br}
 }
 \keyword{ package }
-}
